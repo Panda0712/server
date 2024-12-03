@@ -48,6 +48,38 @@ const register = asyncHandler(async (req, res) => {
   });
 });
 
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const existingUser = await UserModel.findOne({
+    email,
+  });
+
+  if (!existingUser) {
+    res.status(403).json({
+      message: "User not found!!!",
+    });
+    throw new Error("Invalid credentials");
+  }
+
+  const isMatchPassword = await bcrypt.compare(password, existingUser.password);
+
+  if (!isMatchPassword) {
+    res.status(401);
+    throw new Error("Email or Password do not match");
+  }
+
+  res.status(200).json({
+    message: "Login successfully",
+    data: {
+      id: existingUser.id,
+      email: existingUser.email,
+      accessToken: await getJsonWebtoken(email, existingUser.id),
+    },
+  });
+});
+
 module.exports = {
   register,
+  login,
 };
