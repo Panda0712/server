@@ -27,15 +27,9 @@ const getJsonWebtoken = async (email, id) => {
   return token;
 };
 
-const handleSendVerificationEmail = async (val, email) => {
+const handleSendVerificationEmail = async (val) => {
   try {
-    await transporter.sendMail({
-      from: `EventHub Support <${process.env.USER_EMAIL}>`,
-      to: email,
-      subject: "Verification Email",
-      text: "Your verification code",
-      html: `<h1>${val}</h1>`,
-    });
+    await transporter.sendMail(val);
 
     return "OK";
   } catch (error) {
@@ -49,7 +43,15 @@ const verification = asyncHandler(async (req, res) => {
   const verificationCode = Math.round(1000 + Math.random() * 9000);
 
   try {
-    await handleSendVerificationEmail(verificationCode, email);
+    const data = {
+      from: `EventHub Support <${process.env.USER_EMAIL}>`,
+      to: email,
+      subject: "Verification Email",
+      text: "Your verification code",
+      html: `<h1>${verificationCode}</h1>`,
+    };
+
+    await handleSendVerificationEmail(data);
 
     res.status(200).json({
       message: "Verification email sent successfully",
@@ -124,9 +126,53 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const randomPassword = Math.round(100000 + Math.random() * 99000);
+
+  const data = {
+    from: `New password <${process.env.USER_EMAIL}>`,
+    to: email,
+    subject: "Verification Email",
+    text: "Your forgot password email",
+    html: `<h1>${randomPassword}</h1>`,
+  };
+
+  const existingUser = await UserModel.findOne({
+    email,
+  });
+
+  if (existingUser) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(randomPassword.toString(), salt);
+
+    await UserModel.findByIdAndUpdate(user.id, {
+      password: hashedPassword,
+      isChangePassword: true,
+    });
+
+    await handleSendVerificationEmail(data)
+      .then(() => {
+        res.status(200).json({
+          message: "Verification password sent successfully",
+          data: [],
+        });
+      })
+      .catch((err) => {
+        res.status(401);
+        throw new Error("Failed to send forgot password email");
+      });
+  } else {
+    res.status(401);
+    throw new Error("User not found!!!");
+  }
+});
+
 module.exports = {
   register,
   login,
   verification,
   handleSendVerificationEmail,
+  forgotPassword,
 };
