@@ -1,5 +1,7 @@
+// IMPORT MONGOOSE
 const { default: mongoose } = require("mongoose");
 
+// CREATE THE SCHEMA FOR THE USER TABLE
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,

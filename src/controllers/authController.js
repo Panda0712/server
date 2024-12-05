@@ -1,10 +1,17 @@
+// IMPORT USER MODEL
 const UserModel = require("../models/userModel");
+// IMPORT BCRYPT
 const bcrypt = require("bcrypt");
+// IMPORT ASYNC HANDLER
 const asyncHandler = require("express-async-handler");
+// IMPORT JSON WEB TOKEN
 const jwt = require("jsonwebtoken");
+// IMPORT NODEMAILER
 const nodemailer = require("nodemailer");
+// CONFIG DOTENV
 require("dotenv").config();
 
+// DEFINE THE TRANSPORTATION FOR SENDING EMAIL
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
@@ -14,6 +21,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// HANDLE LOGIC FOR GETTING THE JSON WEB TOKEN
 const getJsonWebtoken = async (email, id) => {
   const payload = {
     email,
@@ -27,6 +35,7 @@ const getJsonWebtoken = async (email, id) => {
   return token;
 };
 
+// HANDLE LOGIC FOR SENDING VERIFICATION EMAIL
 const handleSendVerificationEmail = async (val) => {
   try {
     await transporter.sendMail(val);
@@ -37,6 +46,7 @@ const handleSendVerificationEmail = async (val) => {
   }
 };
 
+// HANDLE VERIFICATION LOGIC
 const verification = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -63,6 +73,7 @@ const verification = asyncHandler(async (req, res) => {
   }
 });
 
+// HANDLE LOGIC FOR REGISTERING USER
 const register = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -95,6 +106,7 @@ const register = asyncHandler(async (req, res) => {
   });
 });
 
+// HANDLE LOGIC FOR LOGIN USER
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -126,6 +138,7 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
+// HANDLE LOGIC FOR FORGOT PASSWORD
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 

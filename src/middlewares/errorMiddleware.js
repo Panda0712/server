@@ -1,3 +1,4 @@
+// HANDLE LOGIC FOR ERROR MIDDLEWARE
 const errorMiddleware = (err, _req, res, next) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
 
