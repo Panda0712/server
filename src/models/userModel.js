@@ -3,9 +3,18 @@ const { default: mongoose } = require("mongoose");
 
 // CREATE THE SCHEMA FOR THE USER TABLE
 const UserSchema = new mongoose.Schema({
-  username: {
+  name: {
     type: String,
     require: true,
+  },
+  givenName: {
+    type: String,
+  },
+  familyName: {
+    type: String,
+  },
+  photoUrl: {
+    type: String,
   },
   email: {
     type: String,

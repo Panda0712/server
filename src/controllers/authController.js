@@ -182,10 +182,45 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
+const handleGoogleSignIn = asyncHandler(async (req, res) => {
+  const userInfo = req.body;
+
+  const existingUser = await UserModel.findOne({
+    email: userInfo.email,
+  });
+
+  let user = { ...userInfo };
+
+  if (existingUser) {
+    await UserModel.findByIdAndUpdate(existingUser.id, {
+      ...userInfo,
+      updatedAt: Date.now(),
+    });
+    console.log("Update profile successfully");
+    user.accessToken = await getJsonWebtoken(userInfo.email, existingUser.id);
+  } else {
+    const newUser = new UserModel({
+      email: userInfo.email,
+      fullname: userInfo.name,
+      ...userInfo,
+    });
+    await newUser.save();
+    console.log("Create user successfully");
+
+    user.accessToken = await getJsonWebtoken(userInfo.email, newUser.id);
+  }
+
+  res.status(200).json({
+    message: "Google sign in successfully",
+    data: user,
+  });
+});
+
 module.exports = {
   register,
   login,
   verification,
   handleSendVerificationEmail,
   forgotPassword,
+  handleGoogleSignIn,
 };

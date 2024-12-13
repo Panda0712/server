@@ -6,6 +6,7 @@ const {
   login,
   verification,
   forgotPassword,
+  handleGoogleSignIn,
 } = require("../controllers/authController");
 
 // DECLARE THE AUTH ROUTER
@@ -16,5 +17,6 @@ authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/verification", verification);
 authRouter.post("/forgot", forgotPassword);
+authRouter.post("/google-sign-in", handleGoogleSignIn);
 
 module.exports = authRouter;
